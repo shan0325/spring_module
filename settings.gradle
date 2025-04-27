@@ -1,0 +1,8 @@
+rootProject.name = 'spring_module'
+
+include 'application:app-admin'
+include 'common'
+include 'domain:domain-service'
+findProject(':domain:domain-service')?.name = 'domain-service'
+include 'domain:domain-rdb'
+findProject(':domain:domain-rdb')?.name = 'domain-rdb'

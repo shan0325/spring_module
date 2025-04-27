@@ -1,0 +1,38 @@
+bootJar {
+	enabled = true
+}
+jar {
+	enabled = false
+}
+
+dependencies {
+	implementation project(':common')
+	implementation project(':domain:domain-service')
+	implementation project(':domain:domain-rdb')
+
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// thymeleaf
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+
+	// devtools
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	// test
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// logback.xml 에서 프로파일 별 분기를 위한 if condition 구문을 쓸 수 있게 한다.
+	implementation 'org.codehaus.janino:janino:3.1.9'
+
+	// apache commons-lang3
+	implementation 'org.apache.commons:commons-lang3:3.12.0'
+
+	// modelmapper
+	implementation 'org.modelmapper:modelmapper:3.1.0'
+}

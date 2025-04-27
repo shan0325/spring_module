@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="content">
+<head>
+    <title>회원 관리</title>
+</head>
+<body>
+    <main class="app-main">
+        <div class="app-content-header">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="mb-0">회원 상세</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-end">
+                            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                            <li class="breadcrumb-item" aria-current="page">회원 관리</li>
+                            <li class="breadcrumb-item active" aria-current="page">회원 상세</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="app-content">
+            <div class="container-fluid">
+                <div class="card card-secondary card-outline mb-4">
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-2">아이디</div>
+                            <div class="col-10" th:text="${member.memberId}"></div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-2">이름</div>
+                            <div class="col-10" th:text="${member.name}"></div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-2">권한</div>
+                            <div class="col-10" th:text="${member.roleDesc}"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-2">등록일</div>
+                            <div class="col-10" th:text="${#temporals.format(member.regDate, 'yyyy-MM-dd HH:mm:ss')}"></div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <a th:href="@{/members}" class="btn btn-secondary">목록</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

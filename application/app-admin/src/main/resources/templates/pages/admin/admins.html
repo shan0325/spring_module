@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="content">
+<head>
+    <title>관리자 관리</title>
+</head>
+<body>
+    <main class="app-main">
+        <div class="app-content-header">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="mb-0">관리자 목록</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-end">
+                            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                            <li class="breadcrumb-item" aria-current="page">관리자 관리</li>
+                            <li class="breadcrumb-item active" aria-current="page">관리자 목록</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="app-content">
+            <div class="container-fluid">
+                <div class="row mb-3">
+                    <div class="col-sm-2">
+                        <select class="form-select" id="selectSearchType">
+                            <option value="">전체</option>
+                            <option value="id">아이디</option>
+                            <option value="name">이름</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-2 d-none" id="divSearchInputWrap">
+                        <input type="text" class="form-control" id="inpSearch">
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="submit" class="btn btn-primary" id="btnSearch">검색</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <table class="table table-bordered text-center">
+                                    <thead>
+                                    <tr>
+                                        <th style="width: 4%">#</th>
+                                        <th>아이디</th>
+                                        <th>이름</th>
+                                        <th style="width: 20%">이메일</th>
+                                        <th style="width: 15%">권한</th>
+                                        <th style="width: 15%">상태</th>
+                                        <th style="width: 15%">등록일</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="tbodyTable">
+                                    <tr class="align-middle">
+                                        <td colspan="7" class="p-5">데이터가 존재하지 않습니다.</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between">
+                                <div class="d-flex justify-content-center flex-grow-1">
+                                    <ul class="pagination m-0"></ul>
+                                </div>
+                                <button type="button" class="btn btn-primary" id="btnCreate">등록</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/pagination.js"></script>
+    <script th:inline="javascript">
+        const SC_ADMIN = (function ($) {
+            let _args;
+            let _data;
+            let _el;
+            let _methods;
+            let _eventHandle;
+            let _fetch;
+            let _init;
+
+            _args = {}
+
+            _data = {
+                pagination: null,
+            }
+
+            _el = {
+                selectSearchType: () => $('#selectSearchType'),
+                divSearchInputWrap: () => $('#divSearchInputWrap'),
+                inpSearch: () => $('#inpSearch'),
+                btnSearch: () => $('#btnSearch'),
+                tbodyTable: () => $('#tbodyTable'),
+                btnCreate: () => $('#btnCreate'),
+            }
+
+            _methods = {
+                searchAdmins: async function (page = 0) {
+                    const searchType = _el.selectSearchType().val();
+                    const search = _el.inpSearch().val();
+
+                    const data = await _fetch.getAdmins(page, searchType, search);
+                    if (data.content.length === 0) {
+                        _el.tbodyTable().html(`<tr class="align-middle"><td colspan="7" class="p-5">데이터가 존재하지 않습니다.</td></tr>`);
+                        return;
+                    }
+
+                    let html = '';
+                    data.content.forEach((admin, index) => {
+                        html += `<tr class="align-middle">
+                                    <td>${data.totalElements - (data.pageable.pageNumber * data.pageable.pageSize) - index}</td>
+                                    <td><a href="/admins/${admin.id}" class="link-secondary">${admin.adminId}</a></td>
+                                    <td>${admin.name}</td>
+                                    <td>${admin.email}</td>
+                                    <td>${admin.roleDesc}</td>
+                                    <td>${admin.status}</td>
+                                    <td>${admin.regDate}</td>
+                                </tr>`;
+                    });
+                    _el.tbodyTable().html(html);
+
+                    // 페이징 생성
+                    _data.pagination.makePaging(data);
+                }
+            }
+
+            _eventHandle = function () {
+                // 검색 타입 변경시
+                _el.selectSearchType().on('change', function () {
+                    if ($(this).val()) {
+                        _el.divSearchInputWrap().removeClass('d-none');
+                    } else {
+                        _el.divSearchInputWrap().addClass('d-none');
+                    }
+                });
+
+                // 검색 버튼 클릭시
+                _el.btnSearch().on('click', function () {
+                    _methods.searchAdmins();
+                });
+
+                // 검색어 입력 후 엔터키 입력시
+                _el.inpSearch().on('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        _methods.searchAdmins();
+                    }
+                });
+
+                _el.btnCreate().on('click', function () {
+                    location.href = '/admins/create';
+                });
+            }
+
+            _fetch = {
+                getAdmins: function (page, searchType, search) {
+                    return new Promise((resolve, reject) => {
+                        $.ajax({
+                            url: '/api/admins',
+                            type: 'GET',
+                            data: {page, searchType, search},
+                            success: function (data) {
+                                resolve(data);
+                            }
+                        })
+                    });
+                }
+            }
+
+            _init = function (args = {}) {
+                _args = args;
+                _eventHandle();
+
+                // pagination 세팅
+                const setting = {
+                    target: ".pagination", // 타겟 태그
+                    clickCallback: _methods.searchAdmins // 페이징넘버 클릭시 콜백 함수 정의
+                }
+                _data.pagination = new Pagination(setting);
+
+                // 초기 데이터 조회
+                _methods.searchAdmins();
+            }
+
+            return {
+                init: _init
+            }
+        }(jQuery));
+
+        $(function() {
+            SC_ADMIN.init();
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="content">
+<head>
+    <title>권한 관리</title>
+</head>
+<body>
+    <main class="app-main">
+        <div class="app-content-header">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="mb-0">권한 등록</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-end">
+                            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                            <li class="breadcrumb-item" aria-current="page">권한 관리</li>
+                            <li class="breadcrumb-item active" aria-current="page">권한 등록</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="app-content">
+            <div class="container-fluid">
+                <div class="card card-secondary card-outline mb-4">
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <label for="inpRoleName" class="col-sm-2 col-form-label">권한명</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="roleName" class="form-control" id="inpRoleName" required autofocus />
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="inpRoleDesc" class="col-sm-2 col-form-label">권한 설명</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="roleDesc" class="form-control" id="inpRoleDesc" />
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="inpRoleDesc" class="col-sm-2 col-form-label">상위 권한</label>
+                            <div class="col-sm-10">
+                                <select class="form-select" name="parentRole" id="selectParentRoleName">
+                                    <option value="">없음</option>
+                                    <option th:each="role : ${roles}"
+                                            th:value="${role.roleName}"
+                                            th:text="${role.roleDesc}"></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <button type="button" class="btn btn-success" id="btnCreate">등록</button>
+                        <a th:href="@{/roles/site-type/{siteType}(siteType=${siteType})}" class="btn btn-secondary">목록</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script th:inline="javascript">
+        const SC_ROLE_CREATE = (function ($) {
+            let _args;
+            let _data;
+            let _el;
+            let _methods;
+            let _eventHandle;
+            let _fetch;
+            let _init;
+
+            _args = {}
+
+            _data = {
+            }
+
+            _el = {
+                btnCreate: () => $('#btnCreate'),
+                inpRoleName: () => $('#inpRoleName'),
+                inpRoleDesc: () => $('#inpRoleDesc'),
+                selectParentRoleName: () => $('#selectParentRoleName'),
+
+            }
+
+            _methods = {
+                createRole: async function () {
+                    const roleName = _el.inpRoleName().val();
+                    const roleDesc = _el.inpRoleDesc().val();
+                    const parentRoleName = _el.selectParentRoleName().val();
+
+                    if (!roleName) {
+                        alert('권한명을 입력해주세요.');
+                        _el.inpRoleName().focus();
+                        return;
+                    }
+                    if (!roleDesc) {
+                        alert('권한 설명을 입력해주세요.');
+                        _el.inpRoleDesc().focus();
+                        return;
+                    }
+
+                    await _fetch.createRole({siteType: _args.siteType, roleName, roleDesc, parentRoleName});
+                    alert('등록 되었습니다.');
+                    location.href = '/roles/site-type/' + _args.siteType;
+                },
+            }
+
+            _eventHandle = function () {
+                // 등록 버튼 클릭 시
+                _el.btnCreate().on('click', function () {
+                    _methods.createRole();
+                });
+            }
+
+            _fetch = {
+                createRole: function (params) {
+                    console.log(params);
+                    return new Promise((resolve, reject) => {
+                        $.ajax({
+                            url: `/api/roles`,
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify(params),
+                            success: function (data) {
+                                resolve(data);
+                            }
+                        });
+                    });
+                },
+            }
+
+            _init = function (args = {}) {
+                _args = args;
+                _eventHandle();
+
+            }
+
+            return {
+                init: _init
+            }
+        }(jQuery));
+
+        $(function() {
+            SC_ROLE_CREATE.init({
+                siteType: [[${siteType}]]
+            });
+        })
+    </script>
+</body>
+</html>

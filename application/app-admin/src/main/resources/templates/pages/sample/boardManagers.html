@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="content">
+<head>
+    <style>
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+        }
+        th,
+        td {
+            padding: 6px 15px;
+        }
+        th {
+            background: #42444e;
+            color: #fff;
+            text-align: left;
+        }
+        tr:first-child th:first-child {
+            border-top-left-radius: 6px;
+        }
+        tr:first-child th:last-child {
+            border-top-right-radius: 6px;
+        }
+        td {
+            border-right: 1px solid #c6c9cc;
+            border-bottom: 1px solid #c6c9cc;
+        }
+        td:first-child {
+            border-left: 1px solid #c6c9cc;
+        }
+        tr:nth-child(even) td {
+            background: #eaeaed;
+        }
+        tr:last-child td:first-child {
+            border-bottom-left-radius: 6px;
+        }
+        tr:last-child td:last-child {
+            border-bottom-right-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div style="padding: 50px">
+        <h3>게시판 관리 목록</h3>
+        <br/>
+
+        <table style="width: 1000px">
+            <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>이름</th>
+                    <th>설명</th>
+                    <th>게시판 타입</th>
+                    <th>사용</th>
+                    <th>등록 아이디</th>
+                    <th>등록일</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="boardManager : ${boardManagers}">
+                    <td th:text="${boardManager.id}">1</td>
+                    <td><a href="javascript:;" th:text="${boardManager.name}" class="detailBtn" th:attr="data-id=${boardManager.id}">공지사항</a></td>
+                    <td th:text="${boardManager.description}">공지사항입니다.</td>
+                    <td th:text="${boardManager.boardType.getDescription()}">공지사항</td>
+                    <td th:text="${boardManager.useYn}">Y</td>
+                    <td th:text="${boardManager.createdBy}">admin</td>
+                    <td th:text="${#temporals.format(boardManager.createdDate, 'yyyy.MM.dd HH:mm:ss')}"></td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="button" id="createBtn">등록</button>
+
+        <script th:inline="javascript">
+            $(function () {
+                $('.detailBtn').on('click', function () {
+                    const id = $(this).data('id');
+                    location.href = '/sample/board-managers/' + id;
+                });
+
+                $('#createBtn').on('click', function () {
+                    location.href = '/sample/board-managers/create';
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>

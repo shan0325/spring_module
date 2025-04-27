@@ -1,0 +1,40 @@
+spring:
+  profiles:
+    group:
+      local: common
+      dev: common
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  datasource:
+    main:
+      driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+      jdbc-url: jdbc:log4jdbc:h2:./domain/domain-rdb/DB/h2/ibSport;MODE=MySQL;AUTO_SERVER=TRUE;DATABASE_TO_UPPER=false
+      username: sa
+      password:
+  jpa:
+    hibernate:
+      ddl-auto: none
+      # naming:
+        # physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        # show_sql: true
+        format_sql: true
+        default_batch_fetch_size: 100 # 지연 로딩 성능 최적화를 위해 사용(in 쿼리 개수 설정 100 ~ 1000 권장)
+    open-in-view: false # transaction이 종료될 때 영속성컨텍스트 세션을 닫아줌
+  data:
+    web:
+      pageable:
+        default-page-size: 10 # 기본 페이지 사이즈 20
+
+logging.level:
+  org.hibernate.SQL: debug

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="content">
+<head>
+    <title>권한 관리</title>
+</head>
+<body>
+    <main class="app-main">
+        <div class="app-content-header">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="mb-0">권한 목록</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-end">
+                            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                            <li class="breadcrumb-item" aria-current="page">권한 관리</li>
+                            <li class="breadcrumb-item active" aria-current="page">권한 목록</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="app-content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <table class="table table-bordered text-center">
+                                    <thead>
+                                    <tr>
+                                        <th style="width: 4%">#</th>
+                                        <th style="width: 30%">권한명</th>
+                                        <th>권한 설명</th>
+                                        <th style="width: 30%">상위 권한명</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="tbodyTable">
+                                    <tr class="align-middle">
+                                        <td colspan="4" class="p-5">데이터가 존재하지 않습니다.</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="card-footer d-flex justify-content-end">
+                                <button type="button" class="btn btn-primary" id="btnCreate">등록</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script th:inline="javascript">
+        const SC_ROLE = (function ($) {
+            let _args;
+            let _data;
+            let _el;
+            let _methods;
+            let _eventHandle;
+            let _fetch;
+            let _init;
+
+            _args = {}
+
+            _data = {
+            }
+
+            _el = {
+                tbodyTable: () => $('#tbodyTable'),
+                btnCreate: () => $('#btnCreate'),
+            }
+
+            _methods = {
+                async getRoles() {
+                    const data = await _fetch.getRoles();
+                    if (data.length === 0) {
+                        _el.tbodyTable().html(`<tr class="align-middle"><td colspan="4" class="p-5">데이터가 존재하지 않습니다.</td></tr>`);
+                        return;
+                    }
+
+                    let html = '';
+                    data.forEach((role, index) => {
+                        html += `<tr class="align-middle">
+                                    <td>${data.length - index}</td>
+                                    <td><a href="/roles/${role.id}" class="link-secondary">${role.roleName}</a></td>
+                                    <td>${role.roleDesc}</td>
+                                    <td>${role.parentRoleName ?? "-"}</td>
+                                </tr>`;
+                    });
+                    _el.tbodyTable().html(html);
+                }
+            }
+
+            _eventHandle = function () {
+                _el.btnCreate().on('click', function () {
+                    location.href = `/roles/site-type/${_args.siteType}/create`;
+                });
+            }
+
+            _fetch = {
+                getRoles: () => {
+                    return new Promise((resolve, reject) => {
+                        $.ajax({
+                            url: `/api/roles/site-type/${_args.siteType}`,
+                            type: 'GET',
+                            success: function (data) {
+                                resolve(data);
+                            }
+                        })
+                    })
+                },
+            }
+
+            _init = function (args = {}) {
+                _args = args;
+                _eventHandle();
+
+                // 초기 데이터 조회
+                _methods.getRoles();
+            }
+
+            return {
+                init: _init
+            }
+        }(jQuery));
+
+        $(function() {
+            SC_ROLE.init({
+                siteType: [[${siteType}]]
+            });
+        })
+    </script>
+</body>
+</html>

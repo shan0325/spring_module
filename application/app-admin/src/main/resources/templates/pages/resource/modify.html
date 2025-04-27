@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="content">
+<head>
+    <title>리소스 수정</title>
+</head>
+<body>
+    <main class="app-main">
+        <div class="app-content-header">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="mb-0">리소스 수정</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-end">
+                            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                            <li class="breadcrumb-item" aria-current="page">권한 관리</li>
+                            <li class="breadcrumb-item active" aria-current="page">리소스 수정</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="app-content">
+            <div class="container-fluid">
+                <div class="card card-secondary card-outline mb-4">
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <label for="inpResourcePattern" class="col-sm-2 col-form-label">리소스명</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="resourceName" class="form-control" id="inpResourceName" maxlength="20" th:value="${resource.resourceName}" />
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="inpResourcePattern" class="col-sm-2 col-form-label">리소스 패턴</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="resourcePattern" class="form-control" id="inpResourcePattern" maxlength="200" th:value="${resource.resourcePattern}" />
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="selectHttpMethod" class="col-sm-2 col-form-label">메소드</label>
+                            <div class="col-sm-10">
+                                <select class="form-select" name="httpMethod" id="selectHttpMethod">
+                                    <option th:each="httpMethod : ${httpMethods}"
+                                            th:value="${httpMethod}"
+                                            th:text="${httpMethod}"
+                                            th:selected="${httpMethod.name == resource.httpMethod}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="inpOrderNum" class="col-sm-2 col-form-label">순서</label>
+                            <div class="col-sm-10">
+                                <input type="number" name="orderNum" class="form-control" id="inpOrderNum" th:value="${resource.orderNum}" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <button type="button" class="btn btn-primary" id="btnModify">수정</button>
+                        <button type="button" class="btn btn-danger" id="btnDelete">삭제</button>
+                        <a th:href="@{/resources/site-type/{siteType}(siteType=${resource.siteType})}" class="btn btn-secondary">목록</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script th:inline="javascript">
+        const SC_RESOURCE_MODIFY = (function ($) {
+            let _args;
+            let _data;
+            let _el;
+            let _methods;
+            let _eventHandle;
+            let _fetch;
+            let _init;
+
+            _args = {}
+
+            _data = {}
+
+            _el = {
+                btnModify: () => $('#btnModify'),
+                btnDelete: () => $('#btnDelete'),
+                inpResourceName: () => $('#inpResourceName'),
+                inpResourcePattern: () => $('#inpResourcePattern'),
+                selectHttpMethod: () => $('#selectHttpMethod'),
+                inpOrderNum: () => $('#inpOrderNum'),
+
+            }
+
+            _methods = {
+                modifyResource: async function () {
+                    const resourceName = _el.inpResourceName().val();
+                    const resourcePattern = _el.inpResourcePattern().val();
+                    const httpMethod = _el.selectHttpMethod().val();
+                    const orderNum = _el.inpOrderNum().val();
+
+                    if (!resourceName) {
+                        alert('리소스명을 입력해주세요.');
+                        _el.inpResourceName().focus();
+                        return;
+                    }
+                    if (!resourcePattern) {
+                        alert('리소스 패턴을 입력해주세요.');
+                        _el.inpResourcePattern().focus();
+                        return;
+                    }
+                    if (!httpMethod) {
+                        alert('메소드를 선택해주세요.');
+                        _el.selectHttpMethod().focus();
+                        return;
+                    }
+                    if (!orderNum) {
+                        alert('순서를 입력해주세요.');
+                        _el.inpOrderNum().focus();
+                        return;
+                    }
+
+                    await _fetch.modifyResource({resourceName, resourcePattern, httpMethod, orderNum});
+                    alert('수정 되었습니다.');
+                    location.href = `/resources/site-type/${_args.siteType}`;
+                },
+                deleteResource: async function () {
+                    if (!confirm('정말 삭제하시겠습니까?')) {
+                        return;
+                    }
+
+                    await _fetch.deleteResource();
+                    alert('삭제 되었습니다.');
+                    location.href = `/resources/site-type/${_args.siteType}`;
+                }
+            }
+
+            _eventHandle = function () {
+                // 수정 버튼 클릭 시
+                _el.btnModify().on('click', function () {
+                    _methods.modifyResource();
+                });
+
+                // 삭제 버튼 클릭 시
+                _el.btnDelete().on('click', function () {
+                    _methods.deleteResource();
+                });
+            }
+
+            _fetch = {
+                modifyResource: function (params) {
+                    return new Promise((resolve, reject) => {
+                        $.ajax({
+                            url: `/api/resources/${_args.id}`,
+                            type: 'PUT',
+                            contentType: 'application/json',
+                            data: JSON.stringify(params),
+                            success: function (data) {
+                                resolve(data);
+                            }
+                        });
+                    });
+                },
+                deleteResource: function () {
+                    return new Promise((resolve, reject) => {
+                        $.ajax({
+                            url: `/api/resources/${_args.id}`,
+                            type: 'DELETE',
+                            success: function (data) {
+                                resolve(data);
+                            }
+                        });
+                    });
+                },
+            }
+
+            _init = function (args = {}) {
+                _args = args;
+                _eventHandle();
+
+            }
+
+            return {
+                init: _init
+            }
+        }(jQuery));
+
+        $(function() {
+            SC_RESOURCE_MODIFY.init({
+                id: [[${resource.id}]],
+                siteType: [[${resource.siteType}]]
+            });
+        })
+    </script>
+</body>
+</html>

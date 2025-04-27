@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/loginFormLayout}"
+      layout:fragment="content">
+<head>
+    <title>로그인</title>
+    <link rel="stylesheet" type="text/css" href="/css/login.css">
+</head>
+<body>
+    <div class="container">
+        <div class="login-container">
+            <h2 class="text-center mb-4">로그인</h2>
+            <form name="loginForm" method="post" th:action="@{/auth/login}">
+                <div class="mb-3">
+                    <label for="memberId" class="form-label">아이디</label>
+                    <input type="text" class="form-control" id="memberId" name="memberId" required autofocus placeholder="아이디를 입력하세요" value="admin">
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">비밀번호</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="비밀번호를 입력하세요" value="1234">
+                </div>
+                <button type="submit" class="btn btn-login btn-primary w-100">로그인</button>
+            </form>
+            <!--<div class="text-center mt-3">
+                <a href="#" class="text-decoration-none">비밀번호를 잊으셨나요?</a>
+            </div>-->
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        const SC_LOGIN_FORM = (function ($) {
+            let _args;
+            let _data;
+            let _el;
+            let _methods;
+            let _eventHandle;
+            let _fetch;
+            let _init;
+
+            _args = {}
+            _data = {}
+            _el = {}
+            _methods = {}
+            _eventHandle = function () {}
+            _fetch = {}
+
+            _init = function (args = {}) {
+                _args = args;
+                _eventHandle();
+
+                const message = args.message?.[0];
+                if (message) {
+                    alert(message);
+
+                    const currentUrl = window.location.href;
+                    const updatedUrl = SC_COMMON.removeURLParameter(currentUrl, "message");
+                    history.replaceState({}, document.title, updatedUrl);
+                }
+            }
+
+            return {
+                init: _init
+            }
+        }(jQuery));
+
+        $(function() {
+            SC_LOGIN_FORM.init({
+                message: [[${param.message}]]
+            });
+        })
+    </script>
+</body>
+</html>

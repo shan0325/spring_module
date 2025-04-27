@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="content">
+<head>
+    <title>Home</title>
+</head>
+<body>
+    <div style="height: 200px;">
+        <h1>Content 영역입니다.</h1>
+
+        <h3>Home</h3>
+        <div th:text="${home}">home</div>
+
+        <script th:inline="javascript">
+            $(function () {
+                const home = [[${home}]];
+                console.log(home);
+            });
+        </script>
+    </div>
+</body>
+</html>

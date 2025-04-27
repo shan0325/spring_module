@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="content">
+<head>
+    <title>허용단어 등록</title>
+</head>
+<body>
+    <main class="app-main">
+        <div class="app-content-header">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="mb-0">허용단어 등록</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-end">
+                            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                            <li class="breadcrumb-item" aria-current="page">서비스 관리</li>
+                            <li class="breadcrumb-item active" aria-current="page">허용단어 등록</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="app-content">
+            <div class="container-fluid">
+                <div class="card card-secondary card-outline mb-4">
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <label for="inpWord" class="col-sm-2 col-form-label">허용단어</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="word" class="form-control" id="inpWord" maxlength="20" autofocus />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <button type="button" class="btn btn-primary" id="btnCreate">등록</button>
+                        <a th:href="@{/allow-words}" class="btn btn-secondary">목록</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script th:inline="javascript">
+        const SC_RESOURCE_CREATE = (function ($) {
+            let _args;
+            let _data;
+            let _el;
+            let _methods;
+            let _eventHandle;
+            let _fetch;
+            let _init;
+
+            _args = {}
+
+            _data = {}
+
+            _el = {
+                btnCreate: () => $('#btnCreate'),
+                word: () => $('#inpWord')
+            }
+
+            _methods = {
+                createAllowWord: async function () {
+                    const word = _el.word().val();
+
+                    if (!word) {
+                        alert('허용단어를 입력해주세요.');
+                        _el.word().focus();
+                        return;
+                    }
+
+                    await _fetch.createAllowWord({word: word});
+                    alert('등록 되었습니다.');
+                    location.href = `/allow-words`;
+                },
+            }
+
+            _eventHandle = function () {
+                // 등록 버튼 클릭 시
+                _el.btnCreate().on('click', function () {
+                    _methods.createAllowWord();
+                });
+            }
+
+            _fetch = {
+                createAllowWord: function (params) {
+                    return new Promise((resolve, reject) => {
+                        $.ajax({
+                            url: `/api/allow-words/new`,
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify(params),
+                            success: function (data) {
+                                resolve(data);
+                            }
+                        });
+                    });
+                },
+            }
+
+            _init = function (args = {}) {
+                _args = args;
+                _eventHandle();
+
+            }
+
+            return {
+                init: _init
+            }
+        }(jQuery));
+
+        $(function() {
+            SC_RESOURCE_CREATE.init();
+        })
+    </script>
+</body>
+</html>

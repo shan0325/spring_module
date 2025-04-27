@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="content">
+<head>
+    <title>권한 수정</title>
+</head>
+<body>
+    <main class="app-main">
+        <div class="app-content-header">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="mb-0">권한 수정</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-end">
+                            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                            <li class="breadcrumb-item" aria-current="page">권한 관리</li>
+                            <li class="breadcrumb-item active" aria-current="page">권한 수정</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="app-content">
+            <div class="container-fluid">
+                <div class="card card-secondary card-outline mb-4">
+                    <div class="card-header">
+                        <div class="card-title">권한 정보</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-2">권한명</div>
+                            <div class="col-10" th:text="${modifyDatas.roleName}"></div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="inpRoleDesc" class="col-sm-2 col-form-label">권한 설명</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="roleDesc" class="form-control" id="inpRoleDesc" th:value="${modifyDatas.roleDesc}" />
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="inpRoleDesc" class="col-sm-2 col-form-label">상위 권한</label>
+                            <div class="col-sm-10">
+                                <select class="form-select" name="parentRole" id="selectParentRoleName">
+                                    <option value="">없음</option>
+                                    <option th:each="role : ${modifyDatas.roles}"
+                                            th:value="${role.roleName}"
+                                            th:text="${role.roleDesc}"
+                                            th:selected="${role.roleName == modifyDatas.parentRoleName}"></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <button type="button" class="btn btn-primary" id="btnModify">수정</button>
+                        <button type="button" class="btn btn-danger" id="btnDelete">삭제</button>
+                        <a th:href="@{/roles/site-type/{siteType}(siteType=${modifyDatas.siteType})}" class="btn btn-secondary">목록</a>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header d-flex align-items-center">
+                        <div class="card-title">리소스 목록</div>
+                        <button type="button" class="btn btn-primary" id="btnResourceModal" style="margin-left: auto;">추가</button>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th style="width: 4%">#</th>
+                                    <th style="width: 20%">리소스명</th>
+                                    <th>리소스 패턴</th>
+                                    <th style="width: 7%">메소드</th>
+                                    <th style="width: 7%">순서</th>
+                                    <th style="width: 5%">삭제</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyTable">
+                                <tr class="align-middle">
+                                    <td colspan="6" class="p-5">데이터가 존재하지 않습니다.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal fade" id="divAddResourceModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">리소스 추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="inpSearchResource">
+                        </div>
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-primary" id="btnSearchResource">검색</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table class="table table-bordered text-center">
+                                <thead>
+                                <tr>
+                                    <th style="width: 7%">
+                                        <input type="checkbox" id="inpAllCheckResource" />
+                                    </th>
+                                    <th style="width: 20%">리소스명</th>
+                                    <th>리소스 패턴</th>
+                                    <th style="width: 10%">메소드</th>
+                                    <th style="width: 10%">순서</th>
+                                </tr>
+                                </thead>
+                                <tbody id="tbodyResourceTable">
+                                <tr class="align-middle">
+                                    <td colspan="5" class="p-5">데이터가 존재하지 않습니다.</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="d-flex justify-content-center flex-grow-1">
+                                <ul class="pagination m-0" id="ulResourcePagination"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="btnAddResource">추가</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/pagination.js"></script>
+    <script th:inline="javascript">
+        const SC_ROLE_MODIFY = (function ($) {
+            let _args;
+            let _data;
+            let _el;
+            let _methods;
+            let _eventHandle;
+            let _fetch;
+            let _init;
+
+            _args = {}
+
+            _data = {
+            }
+
+            _el = {
+                tbodyTable: () => $('#tbodyTable'),
+                btnModify: () => $('#btnModify'),
+                btnDelete: () => $('#btnDelete'),
+                inpRoleDesc: () => $('#inpRoleDesc'),
+                selectParentRoleName: () => $('#selectParentRoleName'),
+                btnResourceModal: () => $('#btnResourceModal'),
+                divAddResourceModal: () => $('#divAddResourceModal'),
+                tbodyResourceTable: () => $('#tbodyResourceTable'),
+                inpSearchResource: () => $('#inpSearchResource'),
+                btnSearchResource: () => $('#btnSearchResource'),
+                btnAddResource: () => $('#btnAddResource'),
+                inpAllCheckResource: () => $('#inpAllCheckResource'),
+
+            }
+
+            _methods = {
+                getResourceRoles: async function () {
+                    const data = await _fetch.getResourceRoles();
+                    if (data.length === 0) {
+                        _el.tbodyResourceTable().html(`<tr class="align-middle"><td colspan="6" class="p-5">데이터가 존재하지 않습니다.</td></tr>`);
+                        return;
+                    }
+
+                    let html = '';
+                    data.forEach((resourceRole, index) => {
+                        html += `<tr>
+                                    <td>${data.length - index}</td>
+                                    <td>${resourceRole.resourceName}</td>
+                                    <td>${resourceRole.resourcePattern}</td>
+                                    <td>${resourceRole.httpMethod}</td>
+                                    <td>${resourceRole.orderNum}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger btn-sm btnDeleteResource" data-id="${resourceRole.id}">삭제</button>
+                                    </td>
+                                </tr>`;
+                    });
+                    _el.tbodyTable().html(html);
+                },
+                modifyRole: async function () {
+                    const roleDesc = _el.inpRoleDesc().val();
+                    const parentRoleName = _el.selectParentRoleName().val();
+
+                    if (!roleDesc) {
+                        alert('권한 설명을 입력해주세요.');
+                        _el.inpRoleDesc().focus();
+                        return;
+                    }
+
+                    await _fetch.modifyRole({roleDesc, parentRoleName});
+                    alert('수정 되었습니다.');
+                    location.href = '/roles/site-type/' + _args.siteType;
+                },
+                deleteRole: async function () {
+                    if (!confirm('정말 삭제하시겠습니까?')) {
+                        return;
+                    }
+
+                    await _fetch.deleteRole();
+                    alert('삭제 되었습니다.');
+                    location.href = '/roles/site-type/' + _args.siteType;
+                },
+                async getAllResources(page = 0) {
+                    const search = _el.inpSearchResource().val();
+
+                    const data = await _fetch.getAllResources(page, search);
+                    if (data.content.length === 0) {
+                        _el.tbodyResourceTable().html(`<tr class="align-middle"><td colspan="5" class="p-5">데이터가 존재하지 않습니다.</td></tr>`);
+                        return;
+                    }
+
+                    let html = '';
+                    data.content.forEach((resource, index) => {
+                        html += `<tr class="align-middle">
+                                    <td><input type="checkbox" name="resourceCheckbox" value="${resource.id}" /></td>
+                                    <td>${resource.resourceName}</td>
+                                    <td>${resource.resourcePattern}</td>
+                                    <td>${resource.httpMethod}</td>
+                                    <td>${resource.orderNum}</td>
+                                </tr>`;
+                    });
+                    _el.tbodyResourceTable().html(html);
+
+                    // 페이징 생성
+                    _data.resourcePagination.makePaging(data);
+                },
+                showResourceModal: function () {
+                    _methods.getAllResources();
+
+                    _el.inpAllCheckResource().prop('checked', false);
+                    _el.divAddResourceModal().modal('show');
+                },
+                addResources: async function () {
+                    const resourceIds = [];
+                    $('input[name="resourceCheckbox"]:checked').each(function () {
+                        resourceIds.push($(this).val());
+                    });
+
+                    if (resourceIds.length === 0) {
+                        alert('리소스를 선택해주세요.');
+                        return;
+                    }
+
+                    await _fetch.addResources(resourceIds);
+                    alert('리소스가 추가되었습니다.');
+                    location.reload();
+                },
+                deleteResource: async function (obj) {
+                    if (!confirm('정말 삭제하시겠습니까?')) {
+                        return;
+                    }
+
+                    const id = $(obj).data('id');
+                    if (!id) {
+                        alert('잘못된 접근입니다.');
+                        return;
+                    }
+
+                    await _fetch.deleteResource(id);
+                    alert('삭제 되었습니다.');
+                    location.reload();
+                },
+            }
+
+            _eventHandle = function () {
+                // 수정 버튼 클릭 시
+                _el.btnModify().on('click', function () {
+                    _methods.modifyRole();
+                });
+
+                // 삭제 버튼 클릭 시
+                _el.btnDelete().on('click', function () {
+                    _methods.deleteRole();
+                });
+
+                // 리소스 모달 버튼 클릭 시
+                _el.btnResourceModal().on('click', function () {
+                    _methods.showResourceModal();
+                });
+
+                // 리소스 추가 모달 내 검색 버튼 클릭 시
+                _el.inpSearchResource().on('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        _methods.getAllResources();
+                    }
+                });
+
+                // 리소스 추가 모달 내 검색 버튼 클릭 시
+                _el.btnSearchResource().on('click', function () {
+                    _methods.getAllResources();
+                });
+
+                // 리소스 추가 모달 내 전체 선택 체크박스 클릭 시
+                _el.inpAllCheckResource().on('click', function () {
+                    const isChecked = $(this).prop('checked');
+                    $('input[name="resourceCheckbox"]').prop('checked', isChecked);
+                });
+
+                // 리소스 추가 모달 내 추가 버튼 클릭 시
+                _el.btnAddResource().on('click', function () {
+                    _methods.addResources();
+                });
+
+                // 리소스 삭제 버튼 클릭 시
+                $(document).on('click', '.btnDeleteResource', function () {
+                    _methods.deleteResource(this);
+                });
+            }
+
+            _fetch = {
+                getResourceRoles: function () {
+                    return new Promise((resolve, reject) => {
+                        $.ajax({
+                            url: `/api/resource-roles/role/${_args.id}`,
+                            type: 'GET',
+                            success: function (data) {
+                                resolve(data);
+                            }
+                        });
+                    });
+                },
+                modifyRole: function (params) {
+                    return new Promise((resolve, reject) => {
+                        $.ajax({
+                            url: `/api/roles/${_args.id}`,
+                            type: 'PUT',
+                            contentType: 'application/json',
+                            data: JSON.stringify(params),
+                            success: function (data) {
+                                resolve(data);
+                            }
+                        });
+                    });
+                },
+                deleteRole: function () {
+                    return new Promise((resolve, reject) => {
+                        $.ajax({
+                            url: `/api/roles/${_args.id}`,
+                            type: 'DELETE',
+                            success: function (data) {
+                                resolve(data);
+                            }
+                        });
+                    });
+                },
+                getAllResources: function (page, search) {
+                    return new Promise((resolve, reject) => {
+                        $.ajax({
+                            url: `/api/resources/site-type/${_args.siteType}`,
+                            type: 'GET',
+                            data: {page, size: 20, search},
+                            success: function (data) {
+                                resolve(data);
+                            }
+                        });
+                    });
+                },
+                addResources: function (resourceIds) {
+                    return new Promise((resolve, reject) => {
+                        $.ajax({
+                            url: `/api/roles/${_args.id}/resources`,
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify(resourceIds),
+                            success: function (data) {
+                                resolve(data);
+                            }
+                        });
+                    });
+                },
+                deleteResource: function (id) {
+                    return new Promise((resolve, reject) => {
+                        $.ajax({
+                            url: `/api/roles/resources-roles/${id}`,
+                            type: 'DELETE',
+                            success: function (data) {
+                                resolve(data);
+                            }
+                        });
+                    });
+                },
+            }
+
+            _init = function (args = {}) {
+                _args = args;
+                _eventHandle();
+
+                // pagination 세팅
+                _data.resourcePagination = new Pagination({
+                    target: "#ulResourcePagination", // 타겟 태그
+                    clickCallback: _methods.getAllResources // 페이징넘버 클릭시 콜백 함수 정의
+                });
+
+                _methods.getResourceRoles();
+            }
+
+            return {
+                init: _init
+            }
+        }(jQuery));
+
+        $(function() {
+            SC_ROLE_MODIFY.init({
+                id: [[${modifyDatas.id}]],
+                siteType: [[${modifyDatas.siteType}]]
+            });
+        })
+    </script>
+</body>
+</html>

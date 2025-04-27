@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="content">
+<head>
+    <style>
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+        }
+        th,
+        td {
+            padding: 6px 15px;
+        }
+        th {
+            background: #42444e;
+            color: #fff;
+            text-align: left;
+        }
+        tr:first-child th:first-child {
+            border-top-left-radius: 6px;
+        }
+        tr:first-child th:last-child {
+            border-top-right-radius: 6px;
+        }
+        td {
+            border-right: 1px solid #c6c9cc;
+            border-bottom: 1px solid #c6c9cc;
+        }
+        td:first-child {
+            border-left: 1px solid #c6c9cc;
+        }
+        tr:nth-child(even) td {
+            background: #eaeaed;
+        }
+        tr:last-child td:first-child {
+            border-bottom-left-radius: 6px;
+        }
+        tr:last-child td:last-child {
+            border-bottom-right-radius: 6px;
+        }
+        .active {
+            color: #bd2b2b;
+            font-weight: bold;
+        }
+        .pagination {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div style="padding: 50px">
+        <h3>게시판 목록</h3>
+        <br/>
+
+        <div>
+            <span><a href="/sample/boards" th:class="${boardManagerId == null ? 'active' : ''}">전체</a></span>
+            <span th:each="boardManager : ${boardManagers}">
+                <a th:href="@{/sample/boards?boardManagerId={id}(id=${boardManager.id})}"
+                   th:text="'| ' + ${boardManager.name}"
+                   th:class="${boardManager.id == boardManagerId ? 'active' : ''}"
+                ></a>
+            </span>
+        </div>
+        <br/>
+
+        <div style="width: 1000px">
+            <p th:text="'총 ' + ${paging.totalElements} + '건'"></p>
+            <table>
+                <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>제목</th>
+                    <th>등록 아이디</th>
+                    <th>등록일</th>
+                </tr>
+                </thead>
+                <tbody id="tableBody">
+                <!--<tr th:each="board, boardStat : ${boards}">
+                    <td th:text="${paging.totalElements - (paging.pageable.pageNumber * paging.pageable.pageSize) - boardStat.index}">1</td>
+                    <td>
+                        <a th:href="@{/sample/boards/{id}(id=${board.id}, boardManagerId=${board.sampleBoardManagerId})}"
+                           th:text="${board.title}">공지사항</a>
+                    </td>
+                    <td th:text="${board.createdBy}">admin</td>
+                    <td th:text="${#temporals.format(board.createdDate, 'yyyy.MM.dd HH:mm:ss')}"></td>
+                </tr>-->
+                </tbody>
+            </table>
+            <button type="button" id="createBtn" th:if="${boardManagerId != null}">등록</button>
+
+            <!--<th:block th:replace="~{component/pagination}"></th:block>-->
+            <ul class="pagination"></ul>
+        </div>
+
+        <script src="/js/pagination.js"></script>
+        <script th:inline="javascript">
+            const data = {
+                boardManagerId: [[${boardManagerId}]],
+                pagination: null,
+            }
+
+            function getList(pageNo) {
+                $.ajax({
+                    url: '/api/sample/boards',
+                    type: 'GET',
+                    data: {boardManagerId: data.boardManagerId, page: pageNo},
+                    success: function (result) {
+                        let html = '';
+                        result.content.forEach((board, index) => {
+                            html += `
+                                <tr>
+                                    <td>${result.totalElements - (result.pageable.pageNumber * result.pageable.pageSize) - index}</td>
+                                    <td>
+                                        <a href="/sample/boards/${board.id}?boardManagerId=${board.sampleBoardManagerId}">${board.title}</a>
+                                    </td>
+                                    <td>${board.createdBy}</td>
+                                    <td>${board.createdDate}</td>
+                                </tr>
+                            `;
+                        });
+                        $('#tableBody').html(html);
+
+                        // 페이징 처리
+                        data.pagination.makePaging(result);
+                    }
+                });
+            }
+
+            $(function () {
+                const setting = {
+                    target: '.pagination', // 타겟 태그
+                    clickCallback: getList // 페이징넘버 클릭시 콜백 함수 정의
+                };
+                data.pagination = new Pagination(setting);
+
+                // 목록 조회
+                getList(0);
+
+                $('#pagination li a').on('click', function () {
+                    const page = $(this).data('page');
+                    if (data.boardManagerId == null) {
+                        location.href = `/sample/boards?page=${page}`;
+                    } else {
+                        location.href = `/sample/boards?boardManagerId=${data.boardManagerId}&page=${page}`;
+                    }
+                });
+
+                $('#createBtn').on('click', function () {
+                    location.href = `/sample/boards/create?boardManagerId=${data.boardManagerId}`;
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>

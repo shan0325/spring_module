@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<!-- Thymeleaf 선언 / headerFragment 임을 선언-->
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:fragment="header">
+
+    <nav class="app-header navbar navbar-expand bg-body"> <!--begin::Container-->
+        <div class="container-fluid"> <!--begin::Start Navbar Links-->
+            <ul class="navbar-nav">
+                <li class="nav-item"> <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button"> <i class="bi bi-list"></i> </a> </li>
+                <!--<li class="nav-item d-none d-md-block"> <a th:href="@{/}" class="nav-link">Home</a> </li>
+                <li class="nav-item d-none d-md-block"> <a href="#" class="nav-link">Contact</a> </li>-->
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link" data-bs-toggle="dropdown">
+                        <span class="d-none d-md-inline" sec:authentication="principal.memberId"></span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-sm-end">
+                        <a href="#" class="dropdown-item" id="aPasswordChange">
+                            <i class="bi bi-key-fill"></i> 비밀번호 변경
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a th:href="@{/auth/logout}" class="dropdown-item">
+                            <i class="bi bi-box-arrow-left"></i> 로그아웃
+                        </a>
+                    </div>
+                </li> <!--end::User Menu Dropdown-->
+                <!--<li class="nav-item dropdown">
+                    <a class="nav-link" data-bs-toggle="dropdown" href="#">
+                        <i class="bi bi-gear-fill"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-sm-end">
+                        <a href="#" class="dropdown-item">
+                            <i class="bi bi-envelope me-2"></i> 설정1
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">
+                            <i class="bi bi-people-fill me-2"></i> 설정2
+                        </a>
+                    </div>
+                </li>-->
+            </ul> <!--end::End Navbar Links-->
+        </div> <!--end::Container-->
+    </nav> <!--end::Header--> <!--begin::Sidebar-->
+    <th:block th:replace="~{component/passwordChange}"></th:block>
+
+    <script th:inline="javascript">
+        const SC_HEADER = (function ($) {
+            let _args;
+            let _data;
+            let _el;
+            let _methods;
+            let _eventHandle;
+            let _fetch;
+            let _init;
+
+            _args = {}
+            _data = {}
+            _el = {
+                aPasswordChange: () => $('#aPasswordChange'),
+                divPasswordChangeModal: () => $('#divPasswordChangeModal'),
+            }
+            _methods = {
+                removeURLParameter(url, parameter) {
+                    const urlObj = new URL(url);
+                    const params = urlObj.searchParams;
+                    params.delete(parameter);
+                    return urlObj.toString();
+                }
+            }
+            _eventHandle = function () {
+                _el.aPasswordChange().on('click', function () {
+                    _el.divPasswordChangeModal().modal('show');
+                });
+            }
+            _fetch = {}
+
+            _init = function (args = {}) {
+                _args = args;
+                _eventHandle();
+
+                // 비밀번호 만료 알림
+                const passwordExpiredAlert = args.passwordExpiredAlert?.[0];
+                if (passwordExpiredAlert) {
+                    _el.divPasswordChangeModal().modal('show');
+
+                    const currentUrl = window.location.href;
+                    const updatedUrl = SC_COMMON.removeURLParameter(currentUrl, "passwordExpiredAlert");
+                    history.replaceState({}, document.title, updatedUrl);
+                }
+            }
+
+            return {
+                init: _init
+            }
+        }(jQuery));
+
+        $(function() {
+            SC_HEADER.init({
+                passwordExpiredAlert: [[${param.passwordExpiredAlert}]]
+            });
+        })
+    </script>
+</html>

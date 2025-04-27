@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<!-- Thymeleaf 선언 / headerFragment 임을 선언-->
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      th:fragment="aside">
+
+    <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark"> <!--begin::Sidebar Brand-->
+        <div class="sidebar-brand">
+            <a th:href="@{/}" class="brand-link">
+                <span class="brand-text fw-light ms-0">ADMIN</span>
+            </a>
+        </div>
+
+        <div class="sidebar-wrapper">
+            <nav class="mt-2">
+                <!-- ul 태그에 data-lte-toggle="treeview" 넣으면 메뉴 닫기, 펼침 가능 -->
+                <ul class="nav sidebar-menu flex-column" role="menu" data-accordion="false">
+                    <li class="nav-item menu-open">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon bi bi-people-fill"></i>
+                            <p>관리자 관리<i class="nav-arrow bi bi-chevron-right"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a th:href="@{/admins}" class="nav-link">
+                                    <i class="nav-icon bi bi-circle"></i>
+                                    <p>관리자 목록</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item menu-open">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon bi bi-people-fill"></i>
+                            <p>회원 관리<i class="nav-arrow bi bi-chevron-right"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a th:href="@{/members}" class="nav-link">
+                                    <i class="nav-icon bi bi-circle"></i>
+                                    <p>회원 목록</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item menu-open">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon bi bi-key-fill"></i>
+                            <p>권한 관리<i class="nav-arrow bi bi-chevron-right"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a th:href="@{/roles/site-type/ADMIN}" class="nav-link">
+                                    <i class="nav-icon bi bi-circle"></i>
+                                    <p>관리자 권한 목록</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a th:href="@{/resources/site-type/ADMIN}" class="nav-link">
+                                    <i class="nav-icon bi bi-circle"></i>
+                                    <p>관리자 리소스 목록</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a th:href="@{/roles/site-type/USER}" class="nav-link">
+                                    <i class="nav-icon bi bi-circle"></i>
+                                    <p>사용자 권한 목록</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a th:href="@{/resources/site-type/USER}" class="nav-link">
+                                    <i class="nav-icon bi bi-circle"></i>
+                                    <p>사용자 리소스 목록</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+
+    <script th:inline="javascript">
+        /*const SELECTOR_SIDEBAR_WRAPPER = ".sidebar-wrapper";
+        const Default = {
+            scrollbarTheme: "os-theme-light",
+            scrollbarAutoHide: "leave",
+            scrollbarClickScroll: true,
+        };
+        document.addEventListener("DOMContentLoaded", function() {
+            const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
+            if (
+                sidebarWrapper &&
+                typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined"
+            ) {
+                OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+                    scrollbars: {
+                        theme: Default.scrollbarTheme,
+                        autoHide: Default.scrollbarAutoHide,
+                        clickScroll: Default.scrollbarClickScroll,
+                    },
+                });
+            }
+        });*/
+
+        const SC_ASIDE = (function ($) {
+            let _args;
+            let _data;
+            let _el;
+            let _methods;
+            let _eventHandle;
+            let _fetch;
+            let _init;
+
+            _args = {}
+            _data = {}
+            _el = {
+                clsSidebarWrapper: () => $('.sidebar-wrapper'),
+            }
+            _methods = {}
+            _eventHandle = function () {}
+            _fetch = {}
+
+            _init = function (args = {}) {
+                _args = args;
+                _eventHandle();
+
+                _el.clsSidebarWrapper().find('.nav-link').each(function() {
+                    const href = $(this).attr('href');
+                    if (location.pathname.includes(href)) {
+                        $(this).addClass('active');
+                    }
+                });
+            }
+
+            return {
+                init: _init
+            }
+        }(jQuery));
+
+        $(function() {
+            SC_ASIDE.init();
+        })
+    </script>
+</html>

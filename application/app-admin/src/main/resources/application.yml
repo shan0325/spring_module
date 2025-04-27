@@ -1,0 +1,10 @@
+server:
+  port: 8001
+
+spring:
+  profiles:
+    group:
+      local: common, domain-service, domain-rdb
+      dev: common, domain-service, domain-rdb
+
+

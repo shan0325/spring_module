@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="content">
+<head>
+    <title>관리자 관리</title>
+</head>
+<body>
+    <main class="app-main">
+        <div class="app-content-header">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="mb-0">관리자 수정</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-end">
+                            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                            <li class="breadcrumb-item" aria-current="page">관리자 관리</li>
+                            <li class="breadcrumb-item active" aria-current="page">관리자 수정</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="app-content">
+            <div class="container-fluid">
+                <div class="card card-secondary card-outline mb-4">
+                    <form th:object="${admin}">
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-sm-2">아이디</div>
+                            <div class="col-sm-10" th:text="${admin.adminId}"></div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="inpPassword" class="col-sm-2 col-form-label">비밀번호</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="password" class="form-control" id="inpPassword" />
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="inpName" class="col-sm-2 col-form-label">이름</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="name" class="form-control" id="inpName" th:field="*{name}" />
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="inpEmail" class="col-sm-2 col-form-label">이메일</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="email" class="form-control" id="inpEmail" th:field="*{email}" />
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="selectRoleName" class="col-sm-2 col-form-label">권한</label>
+                            <div class="col-sm-10">
+                                <select class="form-select" name="role" id="selectRoleName" th:field="*{roleName}">
+                                    <option th:each="role : ${roles}"
+                                            th:value="${role.roleName}"
+                                            th:text="${role.roleDesc}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <fieldset class="row mb-3">
+                            <legend class="col-form-label col-sm-2 pt-0">상태</legend>
+                            <div class="col-sm-10">
+                                <div th:each="type : ${status}" class="form-check d-inline-block me-3">
+                                    <input class="form-check-input" type="radio" th:id="'status_' + ${type}"
+                                           name="status" th:value="${type}"
+                                           th:checked="${type == admin.status}" />
+                                    <label class="form-check-label" th:for="'status_' + ${type}" th:text="${type.statusName}"></label>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="row">
+                            <div class="col-2">등록일</div>
+                            <div class="col-10" th:text="${#temporals.format(admin.regDate, 'yyyy-MM-dd HH:mm:ss')}"></div>
+                        </div>
+                    </div>
+                    </form>
+                    <div class="card-footer text-center">
+                        <button type="button" class="btn btn-primary" id="btnModify">수정</button>
+                        <button type="button" class="btn btn-danger" id="btnDelete">삭제</button>
+                        <a th:href="@{/admins}" class="btn btn-secondary">목록</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script th:inline="javascript">
+        const SC_ADMIN_MODIFY = (function ($) {
+            let _args;
+            let _data;
+            let _el;
+            let _methods;
+            let _eventHandle;
+            let _fetch;
+            let _init;
+
+            _args = {}
+
+            _data = {
+            }
+
+            _el = {
+                btnModify: () => $('#btnModify'),
+                btnDelete: () => $('#btnDelete'),
+                inpPassword: () => $('#inpPassword'),
+                inpName: () => $('#inpName'),
+                inpEmail: () => $('#inpEmail'),
+                selectRoleName: () => $('#selectRoleName'),
+                radioCheckedStatus: () => $('input:radio[name="status"]:checked'),
+
+            }
+
+            _methods = {
+                modifyAdmin: async function () {
+                    const password = _el.inpPassword().val();
+                    const name = _el.inpName().val();
+                    const email = _el.inpEmail().val();
+                    const roleName = _el.selectRoleName().val();
+                    const status = _el.radioCheckedStatus().val();
+
+                    if (password && password.length < 4) {
+                        alert('비밀번호는 4자 이상 입력해주세요.');
+                        _el.inpPassword().focus();
+                        return;
+                    }
+                    if (!name) {
+                        alert('이름을 입력해주세요.');
+                        _el.inpName().focus();
+                        return;
+                    }
+                    if (!email) {
+                        alert('이메일을 입력해주세요.');
+                        _el.inpEmail().focus();
+                        return;
+                    }
+                    if (!roleName) {
+                        alert('권한을 선택해주세요.');
+                        return;
+                    }
+                    if (!status) {
+                        alert('활성화 여부를 선택해주세요.');
+                        return;
+                    }
+
+                    await _fetch.modifyAdmin({password, name, email, roleName, status});
+                    alert('수정 되었습니다.');
+                    location.href = '/admins';
+                },
+                deleteAdmin: async function () {
+                    if (!confirm('정말 삭제하시겠습니까?')) {
+                        return;
+                    }
+
+                    await _fetch.deleteAdmin();
+                    alert('삭제 되었습니다.');
+                    location.href = '/admins';
+                },
+            }
+
+            _eventHandle = function () {
+                // 수정 버튼 클릭 시
+                _el.btnModify().on('click', function () {
+                    _methods.modifyAdmin();
+                });
+
+                // 삭제 버튼 클릭 시
+                _el.btnDelete().on('click', function () {
+                    _methods.deleteAdmin();
+                });
+            }
+
+            _fetch = {
+                modifyAdmin: function (params) {
+                    return new Promise((resolve, reject) => {
+                        $.ajax({
+                            url: `/api/admins/${_args.id}`,
+                            type: 'PUT',
+                            contentType: 'application/json',
+                            data: JSON.stringify(params),
+                            success: function (data) {
+                                resolve(data);
+                            }
+                        });
+                    });
+                },
+                deleteAdmin: function () {
+                    return new Promise((resolve, reject) => {
+                        $.ajax({
+                            url: `/api/admins/${_args.id}`,
+                            type: 'DELETE',
+                            success: function (data) {
+                                resolve(data);
+                            }
+                        });
+                    });
+                },
+            }
+
+            _init = function (args = {}) {
+                _args = args;
+                _eventHandle();
+
+            }
+
+            return {
+                init: _init
+            }
+        }(jQuery));
+
+        $(function() {
+            SC_ADMIN_MODIFY.init({
+                id: [[${admin.id}]]
+            });
+        })
+    </script>
+</body>
+</html>

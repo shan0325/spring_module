@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="content">
+<body>
+    <div style="padding: 50px">
+        <h3>게시판 등록</h3>
+        <br/>
+
+        <form id="board" th:object="${board}">
+            <div>
+                <label for="title">제목</label>
+                <input type="text" id="title" th:field="*{title}" />
+            </div>
+            <div>
+                <label for="content">내용</label>
+                <input type="text" id="content" th:field="*{content}" />
+            </div>
+            <div>
+                <button th:if="${board.id != null}" type="button" id="deleteBtn">삭제</button>
+                <button type="button" id="createBtn">등록</button>
+                <button type="button" id="listBtn">목록</button>
+            </div>
+        </form>
+
+        <script th:inline="javascript">
+            const data = {
+                id: [[${board.id}]],
+                boardManagerId: [[${boardManagerId}]],
+                listUrl: `/sample/boards?boardManagerId=${[[${boardManagerId}]]}`
+            };
+
+            $(function () {
+                $('#listBtn').on('click', function () {
+                    location.href = data.listUrl;
+                });
+
+                $('#createBtn').on('click', function () {
+                    if (data.id) {
+                        modifyBoard();
+                    } else {
+                        createBoard();
+                    }
+                });
+
+                $('#deleteBtn').on('click', function () {
+                    if (!data.id) {
+                        alert('등록된 게시판이 아닙니다.');
+                        return;
+                    }
+
+                    deleteBoard();
+                });
+            });
+
+            function modifyBoard() {
+                const title = $('#title').val();
+                const content = $('#content').val();
+                const boardManagerId = data.boardManagerId;
+
+                $.ajax({
+                    url: `/api/sample/boards/${data.id}`,
+                    type: 'put',
+                    contentType: 'application/json',
+                    data: JSON.stringify({title, content, boardManagerId}),
+                    success: function () {
+                        alert('수정되었습니다.');
+                        location.href = data.listUrl;
+                    },
+                    error: function (xhr, statusCode, error) {
+                        alert('수정에 실패했습니다.');
+                    }
+                });
+            }
+
+            function createBoard() {
+                const title = $('#title').val();
+                const content = $('#content').val();
+                const boardManagerId = data.boardManagerId;
+
+                $.ajax({
+                    url: '/api/sample/boards',
+                    type: 'post',
+                    contentType: 'application/json',
+                    data: JSON.stringify({title, content, boardManagerId}),
+                    success: function () {
+                        alert('등록되었습니다.');
+                        location.href = data.listUrl;
+                    },
+                    error: function (xhr, statusCode, error) {
+                        alert('등록에 실패했습니다.');
+                    }
+                });
+            }
+
+            function deleteBoard() {
+                $.ajax({
+                    url: `/api/sample/boards/${data.id}`,
+                    type: 'delete',
+                    success: function () {
+                        alert('삭제되었습니다.');
+                        location.href = data.listUrl;
+                    },
+                    error: function (xhr, statusCode, error) {
+                        alert('삭제에 실패했습니다.');
+                    }
+                });
+            }
+        </script>
+    </div>
+</body>
+</html>

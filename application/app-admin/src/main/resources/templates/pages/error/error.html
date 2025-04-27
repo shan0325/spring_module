@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/emptyLayout}"
+      layout:fragment="content">
+<head>
+    <meta charset="UTF-8">
+    <title>Error Page</title>
+
+    <style>
+        .error-page {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background-color: #f8f9fa;
+        }
+        .error-message {
+            max-width: 600px;
+        }
+        .error-message h1 {
+            font-size: 5rem;
+            font-weight: bold;
+        }
+        .error-message p {
+            font-size: 1.25rem;
+            color: #6c757d;
+        }
+        .error-message .btn {
+            font-size: 1.1rem;
+            padding: 10px 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-page">
+        <div class="error-message">
+            <h1 th:text="${#strings.isEmpty(exceptionResponse.code) ? '500' : exceptionResponse.code}"></h1>
+            <p th:text="${exceptionResponse.message}"></p>
+            <a class="btn btn-primary" href="/">메인이동</a>
+            <a class="btn btn-primary" th:if="${not #strings.isEmpty(exceptionResponse.redirectUrl)}" th:href="${exceptionResponse.redirectUrl}">이동하기</a>
+        </div>
+    </div>
+</body>
+</html>

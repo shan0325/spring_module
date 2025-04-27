@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="content">
+<head>
+    <title>금칙어 수정</title>
+</head>
+<body>
+    <main class="app-main">
+        <div class="app-content-header">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="mb-0">금칙어 수정</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-end">
+                            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                            <li class="breadcrumb-item" aria-current="page">서비스 관리</li>
+                            <li class="breadcrumb-item active" aria-current="page">금칙어 수정</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="app-content">
+            <div class="container-fluid">
+                <div class="card card-secondary card-outline mb-4">
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <label for="inpWord" class="col-sm-2 col-form-label">금칙어</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="word" class="form-control" id="inpWord" maxlength="20" th:value="${banWord.word}" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <button type="button" class="btn btn-primary" id="btnModify">수정</button>
+                        <button type="button" class="btn btn-danger" id="btnDelete">삭제</button>
+                        <a th:href="@{/ban-words}" class="btn btn-secondary">목록</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script th:inline="javascript">
+        const SC_RESOURCE_MODIFY = (function ($) {
+            let _args;
+            let _data;
+            let _el;
+            let _methods;
+            let _eventHandle;
+            let _fetch;
+            let _init;
+
+            _args = {}
+
+            _data = {}
+
+            _el = {
+                btnModify: () => $('#btnModify'),
+                btnDelete: () => $('#btnDelete'),
+                banWord: () => $('#inpWord'),
+
+            }
+
+            _methods = {
+                modifyBanWord: async function () {
+                    const banWord = _el.banWord().val();
+
+                    if (!banWord) {
+                        alert('금칙어를 입력해주세요.');
+                        _el.banWord().focus();
+                        return;
+                    }
+
+                    await _fetch.modifyBanWord({word:banWord});
+                    alert('수정 되었습니다.');
+                    location.href = `/ban-words`;
+                },
+                deleteBanWord: async function () {
+                    if (!confirm('정말 삭제하시겠습니까?')) {
+                        return;
+                    }
+
+                    await _fetch.deleteBanWord();
+                    alert('삭제 되었습니다.');
+                    location.href = `/ban-words`;
+                }
+            }
+
+            _eventHandle = function () {
+                // 수정 버튼 클릭 시
+                _el.btnModify().on('click', function () {
+                    _methods.modifyBanWord();
+                });
+
+                // 삭제 버튼 클릭 시
+                _el.btnDelete().on('click', function () {
+                    _methods.deleteBanWord();
+                });
+            }
+
+            _fetch = {
+                modifyBanWord: function (params) {
+                    return new Promise((resolve, reject) => {
+                        $.ajax({
+                            url: `/api/ban-words/${_args.id}`,
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify(params),
+                            success: function (data) {
+                                resolve(data);
+                            }
+                        });
+                    });
+                },
+                deleteBanWord: function () {
+                    return new Promise((resolve, reject) => {
+                        $.ajax({
+                            url: `/api/ban-words/${_args.id}`,
+                            type: 'DELETE',
+                            success: function (data) {
+                                resolve(data);
+                            }
+                        });
+                    });
+                },
+            }
+
+            _init = function (args = {}) {
+                _args = args;
+                _eventHandle();
+
+            }
+
+            return {
+                init: _init
+            }
+        }(jQuery));
+
+        $(function() {
+            SC_RESOURCE_MODIFY.init({
+                id: [[${banWord.id}]]
+            });
+        })
+    </script>
+</body>
+</html>

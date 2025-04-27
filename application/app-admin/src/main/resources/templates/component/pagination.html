@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <ul class="pagination m-0" id="pagination"
+        th:with="
+            pageNumber = ${paging.pageable.pageNumber},
+            pageSize = 10,
+            totalPages = ${paging.totalPages},
+            startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
+            tempEndPage = ${startPage + pageSize - 1},
+            endPage = ${tempEndPage < totalPages ? tempEndPage : totalPages},
+            prevBlockPage = ${startPage == 1 ? 1 : startPage - 1},
+            nextBlockPage = ${endPage == totalPages ? endPage : endPage + 1}">
+
+        <li th:classappend="${paging.first} ? 'disabled'" class="page-item">
+            <a href="javascript:;" class="page-link" th:data-page="0">&lt;&lt;</a>
+        </li>
+        <li th:classappend="${paging.first} ? 'disabled'" class="page-item">
+            <a href="javascript:;" class="page-link" th:data-page="${#numbers.formatInteger(prevBlockPage - 1, 0)}">&lt;</a>
+        </li>
+        <li th:each="page: ${#numbers.sequence(startPage, endPage)}" th:classappend="${page == pageNumber + 1} ? 'active'" class="page-item">
+            <a href="javascript:;" class="page-link" th:data-page="${page - 1}" th:text="${page}"></a>
+        </li>
+        <li th:classappend="${paging.last} ? 'disabled'" class="page-item">
+            <a href="javascript:;" class="page-link" th:data-page="${#numbers.formatInteger(nextBlockPage - 1, 0)}">&gt;</a>
+        </li>
+        <li th:classappend="${paging.last} ? 'disabled'" class="page-item">
+            <a href="javascript:;" class="page-link" th:data-page="${totalPages - 1}">&gt;&gt;</a>
+        </li>
+    </ul>
+</body>
+</html>

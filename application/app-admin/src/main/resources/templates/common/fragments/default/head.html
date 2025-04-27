@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      th:fragment="head">
+<head>
+    <!--Common Head-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0, minimum-scale=1, user-scalable=yes,initial-scale=1.0"/>
+    <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE"></title>
+
+    <!--Common CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css" integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.min.css" integrity="sha256-Qsx5lrStHZyR9REqhUF8iQt73X06c8LGIUPzpOhwRrI=" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/modules/overlayscrollbars/overlayscrollbars.min.css">
+    <link rel="stylesheet" type="text/css" href="/modules/adminlte/adminlte.css">
+
+    <!--Common JS-->
+    <script type="text/javascript" src="/modules/jquery/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="/modules/popper/popper.min.js"></script>
+    <script type="text/javascript" src="/modules/overlayscrollbars/overlayscrollbars.browser.es6.min.js"></script>
+    <script type="text/javascript" src="/modules/bootstrap/bootstrap.js"></script>
+    <script type="text/javascript" src="/modules/adminlte/adminlte.js"></script>
+    <script type="text/javascript" src="/js/jqueryAjaxSetup.js"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+</head>
+</html>

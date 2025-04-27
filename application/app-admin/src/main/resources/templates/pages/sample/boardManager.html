@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="content">
+<body>
+    <div style="padding: 50px">
+        <h3>게시판 관리 등록</h3>
+        <br/>
+
+        <form id="boardManager" th:object="${boardManager}">
+            <div>
+                <label for="name">이름</label>
+                <input type="text" id="name" th:field="*{name}" />
+            </div>
+            <div>
+                <label for="description">설명</label>
+                <input type="text" id="description" th:field="*{description}" />
+            </div>
+            <div>
+                <label for="boardType">게시판 타입</label>
+                <select name="boardType" id="boardType" th:field="*{boardType}">
+                    <option th:each="type : ${boardTypes}" th:value="${type}" th:text="${type.description}">공지사항</option>
+                </select>
+            </div>
+            <div>
+                <label for="useY">사용</label>
+                <input type="radio" id="useY" value="Y" th:field="*{useYn}" th:checked="${boardManager.useYn == 'Y'}" />
+                <label for="useN">미사용</label>
+                <input type="radio" id="useN" value="N" th:field="*{useYn}" th:checked="${boardManager.useYn == 'N'}" />
+            </div>
+            <div>
+                <button th:if="${boardManager.id != null}" type="button" id="deleteBtn">삭제</button>
+                <button type="button" id="createBtn">등록</button>
+                <button type="button" id="listBtn">목록</button>
+            </div>
+        </form>
+
+        <script th:inline="javascript">
+            const data = {
+                id: [[${boardManager.id}]],
+            };
+
+            $(function () {
+                $('#listBtn').on('click', function () {
+                    location.href = '/sample/board-managers';
+                });
+
+                $('#createBtn').on('click', function () {
+                    if (data.id) {
+                        modifyBoardManager();
+                    } else {
+                        createBoardManager();
+                    }
+                });
+
+                $('#deleteBtn').on('click', function () {
+                    if (!data.id) {
+                        alert('등록된 게시판이 아닙니다.');
+                        return;
+                    }
+
+                    deleteBoardManager();
+                });
+            });
+
+            function modifyBoardManager() {
+                const name = $('#name').val();
+                const description = $('#description').val();
+                const boardType = $('#boardType').val();
+                const useYn = $('input[name=useYn]:checked').val();
+
+                $.ajax({
+                    url: `/api/sample/board-managers/${data.id}`,
+                    type: 'put',
+                    contentType: 'application/json',
+                    data: JSON.stringify({name, description, boardType, useYn}),
+                    success: function (data) {
+                        alert('수정되었습니다.');
+                        location.href = '/sample/board-managers';
+                    },
+                    error: function (xhr, statusCode, error) {
+                        alert('수정에 실패했습니다.');
+                    }
+                });
+            }
+
+            function createBoardManager() {
+                const name = $('#name').val();
+                const description = $('#description').val();
+                const boardType = $('#boardType').val();
+                const useYn = $('input[name=useYn]:checked').val();
+
+                $.ajax({
+                    url: '/api/sample/board-managers',
+                    type: 'post',
+                    contentType: 'application/json',
+                    data: JSON.stringify({name, description, boardType, useYn}),
+                    success: function (data) {
+                        alert('등록되었습니다.');
+                        location.href = '/sample/board-managers';
+                    },
+                    error: function (xhr, statusCode, error) {
+                        alert('등록에 실패했습니다.');
+                    }
+                });
+            }
+
+            function deleteBoardManager() {
+                $.ajax({
+                    url: `/api/sample/board-managers/${data.id}`,
+                    type: 'delete',
+                    success: function (data) {
+                        alert('삭제되었습니다.');
+                        location.href = '/sample/board-managers';
+                    },
+                    error: function (xhr, statusCode, error) {
+                        alert('삭제에 실패했습니다.');
+                    }
+                });
+            }
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+      layout:fragment="content">
+<head>
+    <title>리소스 등록</title>
+</head>
+<body>
+    <main class="app-main">
+        <div class="app-content-header">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="mb-0">리소스 등록</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-end">
+                            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                            <li class="breadcrumb-item" aria-current="page">권한 관리</li>
+                            <li class="breadcrumb-item active" aria-current="page">리소스 등록</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="app-content">
+            <div class="container-fluid">
+                <div class="card card-secondary card-outline mb-4">
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <label for="inpResourcePattern" class="col-sm-2 col-form-label">리소스명</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="resourceName" class="form-control" id="inpResourceName" maxlength="20" autofocus />
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="inpResourcePattern" class="col-sm-2 col-form-label">리소스 패턴</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="resourcePattern" class="form-control" id="inpResourcePattern" maxlength="200" />
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="selectHttpMethod" class="col-sm-2 col-form-label">메소드</label>
+                            <div class="col-sm-10">
+                                <select class="form-select" name="httpMethod" id="selectHttpMethod">
+                                    <option th:each="httpMethod : ${httpMethods}"
+                                            th:value="${httpMethod}"
+                                            th:text="${httpMethod}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="inpOrderNum" class="col-sm-2 col-form-label">순서</label>
+                            <div class="col-sm-10">
+                                <input type="number" name="orderNum" class="form-control" id="inpOrderNum" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <button type="button" class="btn btn-primary" id="btnCreate">등록</button>
+                        <a th:href="@{/resources/site-type/{siteType}(siteType=${siteType})}" class="btn btn-secondary">목록</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script th:inline="javascript">
+        const SC_RESOURCE_CREATE = (function ($) {
+            let _args;
+            let _data;
+            let _el;
+            let _methods;
+            let _eventHandle;
+            let _fetch;
+            let _init;
+
+            _args = {}
+
+            _data = {}
+
+            _el = {
+                btnCreate: () => $('#btnCreate'),
+                inpResourceName: () => $('#inpResourceName'),
+                inpResourcePattern: () => $('#inpResourcePattern'),
+                selectHttpMethod: () => $('#selectHttpMethod'),
+                inpOrderNum: () => $('#inpOrderNum'),
+
+            }
+
+            _methods = {
+                createResource: async function () {
+                    const resourceName = _el.inpResourceName().val();
+                    const resourcePattern = _el.inpResourcePattern().val();
+                    const httpMethod = _el.selectHttpMethod().val();
+                    const orderNum = _el.inpOrderNum().val();
+
+                    if (!resourceName) {
+                        alert('리소스명을 입력해주세요.');
+                        _el.inpResourceName().focus();
+                        return;
+                    }
+                    if (!resourcePattern) {
+                        alert('리소스 패턴을 입력해주세요.');
+                        _el.inpResourcePattern().focus();
+                        return;
+                    }
+                    if (!httpMethod) {
+                        alert('메소드를 선택해주세요.');
+                        _el.selectHttpMethod().focus();
+                        return;
+                    }
+                    if (!orderNum) {
+                        alert('순서를 입력해주세요.');
+                        _el.inpOrderNum().focus();
+                        return;
+                    }
+
+                    await _fetch.createResource({"siteType": _args.siteType, resourceName, resourcePattern, httpMethod, orderNum});
+                    alert('등록 되었습니다.');
+                    location.href = `/resources/site-type/${_args.siteType}`;
+                },
+            }
+
+            _eventHandle = function () {
+                // 등록 버튼 클릭 시
+                _el.btnCreate().on('click', function () {
+                    _methods.createResource();
+                });
+            }
+
+            _fetch = {
+                createResource: function (params) {
+                    return new Promise((resolve, reject) => {
+                        $.ajax({
+                            url: `/api/resources`,
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify(params),
+                            success: function (data) {
+                                resolve(data);
+                            }
+                        });
+                    });
+                },
+            }
+
+            _init = function (args = {}) {
+                _args = args;
+                _eventHandle();
+
+            }
+
+            return {
+                init: _init
+            }
+        }(jQuery));
+
+        $(function() {
+            SC_RESOURCE_CREATE.init({
+                siteType: [[${siteType}]]
+            });
+        })
+    </script>
+</body>
+</html>

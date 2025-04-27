@@ -1,4 +1,4 @@
-package com.sm.app.admin.web.allowWord.usecase;
+package com.sm.app.admin.web.allowWord.service;
 
 import com.sm.app.admin.web.allowWord.dto.AllowWordCreateRequestDto;
 import com.sm.app.admin.web.allowWord.dto.AllowWordModifyRequestDto;
@@ -19,7 +19,7 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 @Service
-public class AllowWordUseCase {
+public class AllowWordService {
     private final AllowWordRepository allowWordRepository;
 
     @Transactional(readOnly = true)

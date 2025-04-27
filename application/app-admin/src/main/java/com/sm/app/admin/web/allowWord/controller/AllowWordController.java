@@ -2,7 +2,7 @@ package com.sm.app.admin.web.allowWord.controller;
 
 import com.sm.app.admin.web.allowWord.dto.AllowWordCreateRequestDto;
 import com.sm.app.admin.web.allowWord.dto.AllowWordModifyRequestDto;
-import com.sm.app.admin.web.allowWord.usecase.AllowWordUseCase;
+import com.sm.app.admin.web.allowWord.service.AllowWordService;
 import com.sm.app.domainrdb.core.allowWord.repository.query.AllowWords;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Controller
 public class AllowWordController {
-    private final AllowWordUseCase allowWordUseCase;
+    private final AllowWordService allowWordService;
 
     @GetMapping("/allow-words")
     public String allowWords() {
@@ -24,12 +24,12 @@ public class AllowWordController {
 
     @GetMapping("/api/allow-words")
     public ResponseEntity<Page<AllowWords>> allowWords(Pageable pageable) {
-        return ResponseEntity.ok(allowWordUseCase.getAllowWords(pageable));
+        return ResponseEntity.ok(allowWordService.getAllowWords(pageable));
     }
 
     @GetMapping("/allow-words/{id}")
     public String allowWord(@PathVariable Long id, Model model) {
-        model.addAttribute("allowWord", allowWordUseCase.getAllowWord(id));
+        model.addAttribute("allowWord", allowWordService.getAllowWord(id));
         return "pages/allowWord/modify";
     }
 
@@ -40,19 +40,19 @@ public class AllowWordController {
 
     @PostMapping("/api/allow-words/new")
     public ResponseEntity<Object> createAllowWord(@RequestBody AllowWordCreateRequestDto allowWordCreateRequestDto) {
-        Long id = allowWordUseCase.addAllowWord(allowWordCreateRequestDto);
+        Long id = allowWordService.addAllowWord(allowWordCreateRequestDto);
         return ResponseEntity.ok(id);
     }
 
     @PostMapping("/api/allow-words/{id}")
     public ResponseEntity<Object> modifyAllowWord(@PathVariable Long id, @RequestBody AllowWordModifyRequestDto allowWordModifyRequestDto) {
-        allowWordUseCase.modifyAllowWord(id, allowWordModifyRequestDto);
+        allowWordService.modifyAllowWord(id, allowWordModifyRequestDto);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/api/allow-words/{id}")
     public ResponseEntity<Object> removeAllowWord(@PathVariable Long id) {
-        allowWordUseCase.removeAllowWord(id);
+        allowWordService.removeAllowWord(id);
         return ResponseEntity.ok().build();
     }
 }

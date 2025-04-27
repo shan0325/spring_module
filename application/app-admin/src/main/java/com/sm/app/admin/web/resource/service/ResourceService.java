@@ -1,4 +1,4 @@
-package com.sm.app.admin.web.resource.usecase;
+package com.sm.app.admin.web.resource.service;
 
 import com.sm.app.admin.config.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
 import com.sm.app.admin.web.resource.dto.ResourceCreateRequestDto;
@@ -23,7 +23,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
-public class ResourceUseCase {
+public class ResourceService {
 
     private final ResourceRepository resourceRepository;
     private final ResourceRoleRepository resourceRoleRepository;

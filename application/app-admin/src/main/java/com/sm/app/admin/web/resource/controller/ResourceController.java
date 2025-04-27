@@ -3,7 +3,7 @@ package com.sm.app.admin.web.resource.controller;
 import com.sm.app.admin.web.resource.dto.ResourceCreateRequestDto;
 import com.sm.app.admin.web.resource.dto.ResourceModifyRequestDto;
 import com.sm.app.admin.web.resource.dto.ResourcesResponseDto;
-import com.sm.app.admin.web.resource.usecase.ResourceUseCase;
+import com.sm.app.admin.web.resource.service.ResourceService;
 import com.sm.app.domainrdb.core.common.enums.SiteTypeEnum;
 import com.sm.app.domainrdb.core.resource.enums.ResourceHttpMethodEnum;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import javax.validation.Valid;
 @Controller
 public class ResourceController {
 
-    private final ResourceUseCase resourceUseCase;
+    private final ResourceService resourceService;
 
     @GetMapping("/resources/site-type/{siteType}")
     public String resources(@PathVariable SiteTypeEnum siteType, Model model) {
@@ -32,7 +32,7 @@ public class ResourceController {
     public ResponseEntity<Page<ResourcesResponseDto>> getResources(@PathVariable SiteTypeEnum siteType,
                                                                    Pageable pageable,
                                                                    @RequestParam(required = false) String search) {
-        return ResponseEntity.ok(resourceUseCase.getResources(siteType, pageable, search));
+        return ResponseEntity.ok(resourceService.getResources(siteType, pageable, search));
     }
 
     @GetMapping("/resources/site-type/{siteType}/create")
@@ -44,13 +44,13 @@ public class ResourceController {
 
     @PostMapping("/api/resources")
     public ResponseEntity<Object> createResource(@RequestBody @Valid ResourceCreateRequestDto resourceCreateRequestDto) {
-        resourceUseCase.createResource(resourceCreateRequestDto);
+        resourceService.createResource(resourceCreateRequestDto);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("resources/{id}")
     public String getResource(@PathVariable Long id, Model model) {
-        model.addAttribute("resource", resourceUseCase.getResource(id));
+        model.addAttribute("resource", resourceService.getResource(id));
         model.addAttribute("httpMethods", ResourceHttpMethodEnum.values());
         return "pages/resource/modify";
     }
@@ -58,13 +58,13 @@ public class ResourceController {
     @PutMapping("/api/resources/{id}")
     public ResponseEntity<Object> modifyResource(@PathVariable Long id,
                                                  @RequestBody @Valid ResourceModifyRequestDto resourceModifyRequestDto) {
-        resourceUseCase.modifyResource(id, resourceModifyRequestDto);
+        resourceService.modifyResource(id, resourceModifyRequestDto);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/api/resources/{id}")
     public ResponseEntity<Object> deleteResource(@PathVariable Long id) {
-        resourceUseCase.deleteResource(id);
+        resourceService.deleteResource(id);
         return ResponseEntity.ok().build();
     }
 }

@@ -1,7 +1,7 @@
 package com.sm.app.admin.web.member.controller;
 
 import com.sm.app.admin.web.member.dto.MembersRequestDto;
-import com.sm.app.admin.web.member.usecase.MemberUseCase;
+import com.sm.app.admin.web.member.service.MemberService;
 import com.sm.app.domainrdb.core.member.repository.query.MemberRoles;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @Controller
 public class MemberController {
 
-    private final MemberUseCase memberUseCase;
+    private final MemberService memberService;
 
     @GetMapping("/members")
     public String members() {
@@ -27,12 +27,12 @@ public class MemberController {
     @GetMapping("/api/members")
     public ResponseEntity<Page<MemberRoles>> getMembers(
             @ModelAttribute MembersRequestDto membersRequestDto, Pageable pageable) {
-        return ResponseEntity.ok(memberUseCase.getMembers(membersRequestDto, pageable));
+        return ResponseEntity.ok(memberService.getMembers(membersRequestDto, pageable));
     }
 
     @GetMapping("/members/{id}")
     public String getMember(@PathVariable Long id, Model model) {
-        model.addAttribute("member", memberUseCase.getMember(id));
+        model.addAttribute("member", memberService.getMember(id));
         return "pages/member/member";
     }
 

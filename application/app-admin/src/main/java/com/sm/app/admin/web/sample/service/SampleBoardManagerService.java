@@ -1,4 +1,4 @@
-package com.sm.app.admin.web.sample.usecase;
+package com.sm.app.admin.web.sample.service;
 
 import com.sm.app.admin.web.sample.dto.SampleBoardManagerCreateRequestDto;
 import com.sm.app.admin.web.sample.dto.SampleBoardManagerModifyRequestDto;
@@ -18,7 +18,7 @@ import java.util.List;
 @Transactional(readOnly = true) // 성능 향상을 위한 기본적으로 읽기전용(readOnly = true)으로 설정
 @RequiredArgsConstructor
 @Service
-public class SampleBoardManagerUseCase {
+public class SampleBoardManagerService {
 
     private final SampleBoardManagerRepository sampleBoardManagerRepository;
     private final ModelMapper modelMapper;

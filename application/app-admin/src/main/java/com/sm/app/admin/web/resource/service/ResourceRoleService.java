@@ -1,4 +1,4 @@
-package com.sm.app.admin.web.resource.usecase;
+package com.sm.app.admin.web.resource.service;
 
 import com.sm.app.admin.web.resource.dto.ResourceRolesResponseDto;
 import com.sm.app.domainrdb.core.resource.repository.resourcerole.ResourceRoleRepository;
@@ -12,7 +12,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
-public class ResourceRoleUseCase {
+public class ResourceRoleService {
 
     private final ResourceRoleRepository resourceRoleRepository;
 

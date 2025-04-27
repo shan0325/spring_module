@@ -1,4 +1,4 @@
-package com.sm.app.admin.web.admin.usecase;
+package com.sm.app.admin.web.admin.service;
 
 import com.sm.app.admin.web.admin.dto.*;
 import com.sm.app.common.exception.ServiceException;
@@ -10,6 +10,7 @@ import com.sm.app.domainrdb.core.admin.repository.query.SearchAdmin;
 import com.sm.app.domainrdb.core.role.entity.Role;
 import com.sm.app.domainrdb.core.role.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +23,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
-public class AdminUseCase {
+public class AdminService {
 
     private final PasswordEncoder passwordEncoder;
     private final AdminRepository adminRepository;
@@ -50,7 +51,7 @@ public class AdminUseCase {
         Role role = roleRepository.findByRoleName(adminModifyRequestDto.getRoleName())
                 .orElseThrow(() -> new ServiceException("권한이 존재하지 않습니다."));
 
-        if (adminModifyRequestDto.getPassword() != null) {
+        if (StringUtils.isNotBlank(adminModifyRequestDto.getPassword())) {
             adminModifyRequestDto.setPassword(passwordEncoder.encode(adminModifyRequestDto.getPassword()));
         }
 

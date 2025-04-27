@@ -1,4 +1,4 @@
-package com.sm.app.admin.web.member.usecase;
+package com.sm.app.admin.web.member.service;
 
 import com.sm.app.admin.web.member.dto.MembersRequestDto;
 import com.sm.app.common.exception.ServiceException;
@@ -15,7 +15,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class MemberUseCase {
+public class MemberService {
 
     private final MemberRepository memberRepository;
 

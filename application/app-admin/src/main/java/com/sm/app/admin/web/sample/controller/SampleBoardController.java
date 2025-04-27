@@ -4,8 +4,8 @@ import com.sm.app.admin.web.sample.dto.SampleBoardCreateRequestDto;
 import com.sm.app.admin.web.sample.dto.SampleBoardModifyRequestDto;
 import com.sm.app.admin.web.sample.dto.SampleBoardResponseDto;
 import com.sm.app.admin.web.sample.dto.SampleBoardsResponseDto;
-import com.sm.app.admin.web.sample.usecase.SampleBoardManagerUseCase;
-import com.sm.app.admin.web.sample.usecase.SampleBoardUseCase;
+import com.sm.app.admin.web.sample.service.SampleBoardManagerService;
+import com.sm.app.admin.web.sample.service.SampleBoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,8 +20,8 @@ import javax.validation.Valid;
 @Controller
 public class SampleBoardController {
 
-    private final SampleBoardManagerUseCase sampleBoardManagerUseCase;
-    private final SampleBoardUseCase sampleBoardUseCase;
+    private final SampleBoardManagerService sampleBoardManagerService;
+    private final SampleBoardService sampleBoardService;
 
 
     // 게시판 목록 페이지 이동
@@ -30,10 +30,10 @@ public class SampleBoardController {
                                   Pageable pageable,
                                   Model model) {
 
-        Page<SampleBoardsResponseDto> sampleBoards = sampleBoardUseCase.getSampleBoards(boardManagerId, pageable);
+        Page<SampleBoardsResponseDto> sampleBoards = sampleBoardService.getSampleBoards(boardManagerId, pageable);
 
         model.addAttribute("boardManagerId", boardManagerId);
-        model.addAttribute("boardManagers", sampleBoardManagerUseCase.getSampleBoardManagers());
+        model.addAttribute("boardManagers", sampleBoardManagerService.getSampleBoardManagers());
         model.addAttribute("boards", sampleBoards.getContent());
         model.addAttribute("paging", sampleBoards);
         return "pages/sample/boards";
@@ -44,7 +44,7 @@ public class SampleBoardController {
             @RequestParam(required = false) Long boardManagerId,
             Pageable pageable) {
 
-        return ResponseEntity.ok(sampleBoardUseCase.getSampleBoards(boardManagerId, pageable));
+        return ResponseEntity.ok(sampleBoardService.getSampleBoards(boardManagerId, pageable));
     }
 
     // 게시판 등록 페이지 이동
@@ -58,7 +58,7 @@ public class SampleBoardController {
     // 게시판 등록 API
     @PostMapping("/api/sample/boards")
     public ResponseEntity<Object> createSampleBoard(@RequestBody @Valid SampleBoardCreateRequestDto createDto) {
-        sampleBoardUseCase.createSampleBoard(createDto);
+        sampleBoardService.createSampleBoard(createDto);
         return ResponseEntity.ok().build();
     }
 
@@ -66,7 +66,7 @@ public class SampleBoardController {
     @GetMapping("/sample/boards/{id}")
     public String sampleBoard(@PathVariable Long id, @RequestParam Long boardManagerId, Model model) {
         model.addAttribute("boardManagerId", boardManagerId);
-        model.addAttribute("board", sampleBoardUseCase.getSampleBoard(id));
+        model.addAttribute("board", sampleBoardService.getSampleBoard(id));
         return "pages/sample/board";
     }
 
@@ -74,14 +74,14 @@ public class SampleBoardController {
     @PutMapping("/api/sample/boards/{id}")
     public ResponseEntity<Object> modifySampleBoard(@PathVariable Long id,
                                                     @RequestBody @Valid SampleBoardModifyRequestDto modifyDto) {
-        sampleBoardUseCase.modifySampleBoard(id, modifyDto);
+        sampleBoardService.modifySampleBoard(id, modifyDto);
         return ResponseEntity.ok().build();
     }
 
     // 게시판 삭제 API
     @DeleteMapping("/api/sample/boards/{id}")
     public ResponseEntity<Object> deleteSampleBoard(@PathVariable Long id) {
-        sampleBoardUseCase.deleteSampleBoard(id);
+        sampleBoardService.deleteSampleBoard(id);
         return ResponseEntity.ok().build();
     }
 }

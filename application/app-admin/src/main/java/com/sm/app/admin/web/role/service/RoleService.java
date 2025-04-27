@@ -1,4 +1,4 @@
-package com.sm.app.admin.web.role.usecase;
+package com.sm.app.admin.web.role.service;
 
 import com.sm.app.admin.config.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
 import com.sm.app.admin.config.security.service.RoleHierarchyUpdateService;
@@ -25,7 +25,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
-public class RoleUseCase {
+public class RoleService {
     private final RoleRepository roleRepository;
     private final ResourceRepository resourceRepository;
     private final ResourceRoleRepository resourceRoleRepository;

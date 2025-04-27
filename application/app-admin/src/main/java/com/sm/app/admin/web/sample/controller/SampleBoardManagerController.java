@@ -3,7 +3,7 @@ package com.sm.app.admin.web.sample.controller;
 import com.sm.app.admin.web.sample.dto.SampleBoardManagerCreateRequestDto;
 import com.sm.app.admin.web.sample.dto.SampleBoardManagerModifyRequestDto;
 import com.sm.app.admin.web.sample.dto.SampleBoardManagerResponseDto;
-import com.sm.app.admin.web.sample.usecase.SampleBoardManagerUseCase;
+import com.sm.app.admin.web.sample.service.SampleBoardManagerService;
 import com.sm.app.domainrdb.core.sample.enums.BoardTypeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,11 +20,11 @@ import javax.validation.Valid;
 public class SampleBoardManagerController {
 
 
-    private final SampleBoardManagerUseCase sampleBoardManagerUseCase;
+    private final SampleBoardManagerService sampleBoardManagerService;
     // 게시판 관리자 목록 페이지 이동
     @GetMapping("/sample/board-managers")
     public String sampleBoardManagers(Model model) {
-        model.addAttribute("boardManagers", sampleBoardManagerUseCase.getSampleBoardManagers());
+        model.addAttribute("boardManagers", sampleBoardManagerService.getSampleBoardManagers());
         return "pages/sample/boardManagers";
     }
 
@@ -39,7 +39,7 @@ public class SampleBoardManagerController {
     // 게시판 관리자 등록 API
     @PostMapping("/api/sample/board-managers")
     public ResponseEntity<Object> createSampleBoardManager(@RequestBody @Valid SampleBoardManagerCreateRequestDto createDto) {
-        sampleBoardManagerUseCase.createSampleBoardManager(createDto);
+        sampleBoardManagerService.createSampleBoardManager(createDto);
         return ResponseEntity.ok().build();
     }
 
@@ -47,7 +47,7 @@ public class SampleBoardManagerController {
     @GetMapping("/sample/board-managers/{id}")
     public String sampleBoardManager(@PathVariable Long id, Model model) {
         model.addAttribute("boardTypes", BoardTypeEnum.values());
-        model.addAttribute("boardManager", sampleBoardManagerUseCase.getSampleBoardManager(id));
+        model.addAttribute("boardManager", sampleBoardManagerService.getSampleBoardManager(id));
         return "pages/sample/boardManager";
     }
 
@@ -55,14 +55,14 @@ public class SampleBoardManagerController {
     @PutMapping("/api/sample/board-managers/{id}")
     public ResponseEntity<Object> modifySampleBoardManager(@PathVariable Long id,
                                                            @RequestBody @Valid SampleBoardManagerModifyRequestDto modifyDto) {
-        sampleBoardManagerUseCase.modifySampleBoardManager(id, modifyDto);
+        sampleBoardManagerService.modifySampleBoardManager(id, modifyDto);
         return ResponseEntity.ok().build();
     }
 
     // 게시판 관리자 삭제 API
     @DeleteMapping("/api/sample/board-managers/{id}")
     public ResponseEntity<Object> deleteSampleBoardManager(@PathVariable Long id) {
-        sampleBoardManagerUseCase.deleteSampleBoardManager(id);
+        sampleBoardManagerService.deleteSampleBoardManager(id);
         return ResponseEntity.ok().build();
     }
 }

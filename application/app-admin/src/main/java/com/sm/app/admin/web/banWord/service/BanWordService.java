@@ -19,7 +19,7 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 @Service
-public class BanWordUseCase {
+public class BanWordService {
     private final BanWordRepository banWordRepository;
 
     @Transactional(readOnly = true)

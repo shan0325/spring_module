@@ -1,4 +1,4 @@
-package com.sm.app.admin.web.sample.usecase;
+package com.sm.app.admin.web.sample.service;
 
 import com.sm.app.admin.web.sample.dto.SampleBoardCreateRequestDto;
 import com.sm.app.admin.web.sample.dto.SampleBoardModifyRequestDto;
@@ -22,7 +22,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
-public class SampleBoardUseCase {
+public class SampleBoardService {
 
     private final SampleBoardManagerRepository sampleBoardManagerRepository;
     private final SampleBoardRepository sampleBoardRepository;
